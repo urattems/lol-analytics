@@ -1,0 +1,1 @@
+"""LoL Analytics automated tests."""
