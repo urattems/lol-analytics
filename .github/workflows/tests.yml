@@ -35,3 +35,32 @@ jobs:
         run: python -m pytest -q -n 3 --dist worksteal --durations=10
       - name: Compile project modules
         run: python -m compileall -q app.py analytics config core pages ui scripts tests
+
+  publish_v260:
+    name: Publish v2.6.0 (one-shot)
+    needs: tests
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'ci: publish v2.6.0' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Build release archive
+        env:
+          TARGET_SHA: 150ca01b093e562bcc4afe064dbbfa5813b1f9c0
+        run: |
+          mkdir -p dist
+          git archive --format=zip --output=dist/LoL-Analytics-v2.6.0.zip "$TARGET_SHA"
+          sha256sum dist/LoL-Analytics-v2.6.0.zip > dist/SHA256SUMS.txt
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: 150ca01b093e562bcc4afe064dbbfa5813b1f9c0
+        run: |
+          gh release create v2.6.0 dist/LoL-Analytics-v2.6.0.zip dist/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --title "LoL Analytics 2.6.0" \
+            --notes "Final public 2.6.0 release. Includes the cleaned public project tree and the CI runtime fix for Windows."
