@@ -39,7 +39,7 @@ jobs:
   publish_v260:
     name: Publish v2.6.0 (one-shot)
     needs: tests
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'ci: publish v2.6.0' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.head_commit.message == 'ci - publish v2.6.0' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
